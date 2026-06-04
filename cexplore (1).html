@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CExplore — Find Your Course</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0a0f;--bg2:#111118;--bg3:#1a1a24;--card:#13131d;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--text:#f0f0f5;--muted:#8080a0;--accent:#7c6af7;--accent2:#a78bfa;--green:#34d399;--amber:#fbbf24;--blue:#60a5fa;--teal:#2dd4bf}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(124,106,247,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(124,106,247,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+nav{position:sticky;top:0;z-index:100;background:rgba(10,10,15,.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;background:linear-gradient(135deg,var(--accent2),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-pill{background:rgba(124,106,247,.12);border:1px solid rgba(124,106,247,.25);color:var(--accent2);font-size:.8rem;font-weight:500;padding:5px 14px;border-radius:20px}
+.hero{position:relative;z-index:1;text-align:center;padding:4rem 2rem 2rem}
+.hero-tag{display:inline-flex;align-items:center;gap:6px;background:rgba(124,106,247,.1);border:1px solid rgba(124,106,247,.25);color:var(--accent2);font-size:.76rem;font-weight:500;padding:5px 14px;border-radius:20px;margin-bottom:1.2rem;letter-spacing:.5px;text-transform:uppercase}
+.hero h1{font-family:'Syne',sans-serif;font-size:clamp(2rem,5vw,3.6rem);font-weight:800;line-height:1.1;letter-spacing:-1.5px;margin-bottom:.8rem}
+.hero h1 span{background:linear-gradient(135deg,var(--accent2),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:.98rem;color:var(--muted);max-width:500px;margin:0 auto 2rem;line-height:1.7}
+.search-wrap{max-width:560px;margin:0 auto;position:relative}
+.search-wrap input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:14px;padding:14px 48px 14px 20px;color:var(--text);font-size:.95rem;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s,box-shadow .2s}
+.search-wrap input::placeholder{color:var(--muted)}
+.search-wrap input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,106,247,.15)}
+.s-icon{position:absolute;right:16px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.stats{display:flex;justify-content:center;gap:2.5rem;padding:1.5rem 0 2rem;z-index:1;position:relative;flex-wrap:wrap}
+.stat{text-align:center}
+.stat-num{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:700;background:linear-gradient(135deg,var(--accent2),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-label{font-size:.77rem;color:var(--muted);margin-top:2px}
+.filters{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:0 2rem 1.5rem}
+.filter-label{font-size:.7rem;color:var(--muted);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px}
+.filter-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}
+.fb{background:var(--bg3);border:1px solid var(--border);color:var(--muted);font-size:.8rem;font-weight:500;padding:6px 13px;border-radius:20px;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+.fb:hover{border-color:var(--accent);color:var(--accent2)}
+.fb.active{background:rgba(124,106,247,.15);border-color:var(--accent);color:var(--accent2)}
+.fb.free-active{background:rgba(52,211,153,.1);border-color:var(--green);color:var(--green)}
+.fb.paid-active{background:rgba(251,191,36,.1);border-color:var(--amber);color:var(--amber)}
+.results-info{max-width:1200px;margin:0 auto;padding:0 2rem .8rem;font-size:.82rem;color:var(--muted);position:relative;z-index:1}
+.results-info span{color:var(--accent2);font-weight:600}
+.grid-section{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:0 2rem 5rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.card{background:var(--card);padding:1.3rem;display:block;text-decoration:none;transition:background .2s}
+.card:hover{background:var(--bg3)}
+.card.hidden{display:none}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.85rem}
+.c-icon{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:800;font-family:'Syne',sans-serif;flex-shrink:0}
+.badges{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.badge{font-size:.67rem;font-weight:500;padding:2px 8px;border-radius:6px}
+.bf{background:rgba(52,211,153,.12);color:var(--green);border:1px solid rgba(52,211,153,.2)}
+.bp{background:rgba(251,191,36,.1);color:var(--amber);border:1px solid rgba(251,191,36,.2)}
+.bc{background:rgba(96,165,250,.1);color:var(--blue);border:1px solid rgba(96,165,250,.2)}
+.c-name{font-family:'Syne',sans-serif;font-size:.97rem;font-weight:700;color:var(--text);margin-bottom:.28rem}
+.c-desc{font-size:.8rem;color:var(--muted);line-height:1.55;margin-bottom:.75rem}
+.c-tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:.75rem}
+.tag{font-size:.69rem;color:var(--muted);background:rgba(255,255,255,.04);border:1px solid var(--border);padding:2px 8px;border-radius:5px}
+.c-footer{display:flex;justify-content:space-between;align-items:center}
+.vlink{font-size:.78rem;color:var(--accent2);font-weight:500;display:flex;align-items:center;gap:4px;transition:gap .2s}
+.card:hover .vlink{gap:8px}
+.rating{font-size:.75rem;color:var(--amber)}
+.no-res{display:none;text-align:center;padding:3rem;color:var(--muted);font-size:.9rem;grid-column:1/-1}
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:1.8rem 2rem;text-align:center;color:var(--muted);font-size:.82rem}
+footer span{color:var(--accent2)}
+@media(max-width:600px){nav{padding:0 1rem}.hero{padding:2.5rem 1rem 1.5rem}.filters,.grid-section,.results-info{padding-left:1rem;padding-right:1rem}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">CExplore</div>
+  <div class="nav-pill" id="navPill">Loading...</div>
+</nav>
+<section class="hero">
+  <div class="hero-tag">✦ Courses Explored. Careers Unlocked.</div>
+  <h1>Find courses that<br><span>actually matter</span></h1>
+  <p>Every major platform offering free & paid certified courses across all subjects — all in one place.</p>
+  <div class="search-wrap">
+    <input type="text" id="searchInput" placeholder="Search platforms, subjects, skills...">
+    <span class="s-icon">🔍</span>
+  </div>
+</section>
+<div class="stats">
+  <div class="stat"><div class="stat-num" id="totalCount">0</div><div class="stat-label">Platforms</div></div>
+  <div class="stat"><div class="stat-num">5M+</div><div class="stat-label">Free Courses</div></div>
+  <div class="stat"><div class="stat-num">20+</div><div class="stat-label">Subjects</div></div>
+  <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Verified</div></div>
+</div>
+<div class="filters">
+  <div class="filter-label">Cost</div>
+  <div class="filter-row" id="costRow">
+    <button class="fb active" onclick="setCost('all',this)">All</button>
+    <button class="fb" onclick="setCost('free',this)">🟢 Free Only</button>
+    <button class="fb" onclick="setCost('paid',this)">💰 Paid</button>
+  </div>
+  <div class="filter-label">Subject</div>
+  <div class="filter-row" id="subRow">
+    <button class="fb active" onclick="setSub('all',this)">All Subjects</button>
+    <button class="fb" onclick="setSub('cs',this)">💻 CS & Programming</button>
+    <button class="fb" onclick="setSub('ai',this)">🤖 AI & ML</button>
+    <button class="fb" onclick="setSub('data',this)">📊 Data Science</button>
+    <button class="fb" onclick="setSub('design',this)">🎨 Design</button>
+    <button class="fb" onclick="setSub('business',this)">💼 Business</button>
+    <button class="fb" onclick="setSub('marketing',this)">📣 Marketing</button>
+    <button class="fb" onclick="setSub('health',this)">🏥 Health</button>
+    <button class="fb" onclick="setSub('finance',this)">💰 Finance</button>
+    <button class="fb" onclick="setSub('lang',this)">🌐 Languages</button>
+    <button class="fb" onclick="setSub('cyber',this)">🔐 Cybersecurity</button>
+    <button class="fb" onclick="setSub('cloud',this)">☁️ Cloud</button>
+    <button class="fb" onclick="setSub('science',this)">🔬 Science & Math</button>
+    <button class="fb" onclick="setSub('arts',this)">🎵 Arts & Music</button>
+    <button class="fb" onclick="setSub('engineering',this)">🏗️ Engineering</button>
+    <button class="fb" onclick="setSub('writing',this)">✍️ Writing</button>
+    <button class="fb" onclick="setSub('photo',this)">📸 Photography</button>
+    <button class="fb" onclick="setSub('pm',this)">📋 Project Mgmt</button>
+  </div>
+</div>
+<div class="results-info"><span id="resCount">0</span> platforms found</div>
+<section class="grid-section">
+  <div class="grid" id="grid">
+    <div class="no-res" id="noRes">😕 No platforms found. Try a different search!</div>
+  </div>
+</section>
+<footer>Built with ❤️ for learners everywhere &nbsp;·&nbsp; <span>CExplore</span> &nbsp;·&nbsp; All links open official platform pages</footer>
+<script>
+const P=[
+  // ── MEGA PLATFORMS ──
+  {n:"Coursera",ic:"C",bg:"#0056d2",d:"Courses from 300+ top universities. Audit free or pay for certificate. Google, IBM, Meta, Yale, Stanford all here.",s:["cs","ai","data","design","business","marketing","health","finance","science","arts","engineering","writing","pm"],c:["free","paid"],cert:1,r:4.7,u:"https://www.coursera.org",t:["University","All Subjects","Specializations"]},
+  {n:"edX",ic:"e",bg:"#02262b",d:"MIT, Harvard, Berkeley courses. MicroMasters & Professional Certificates. Audit most courses for free.",s:["cs","ai","data","design","business","health","science","engineering","writing"],c:["free","paid"],cert:1,r:4.7,u:"https://www.edx.org",t:["MIT","Harvard","MicroMasters"]},
+  {n:"Udemy",ic:"U",bg:"#a435f0",d:"180,000+ courses on everything. Often on sale for ₹499. Lifetime access included with every purchase.",s:["cs","ai","data","design","business","marketing","health","finance","lang","cyber","cloud","arts","engineering","writing","photo","pm"],c:["paid"],cert:1,r:4.5,u:"https://www.udemy.com",t:["All Subjects","Lifetime Access","₹499 Sales"]},
+  {n:"Alison",ic:"A",bg:"#e63946",d:"4,000+ completely free courses across all subjects. Digital certificate is free, small fee to print.",s:["cs","ai","data","design","business","marketing","health","finance","lang","science","arts","engineering","writing","pm","photo"],c:["free"],cert:1,r:4.3,u:"https://alison.com",t:["Free","4000+ Courses","All Subjects"]},
+  {n:"FutureLearn",ic:"FL",bg:"#c0392b",d:"Courses from 170+ universities worldwide. UK-accredited programs in tech, health, business, and education.",s:["cs","business","health","science","arts","writing","lang","engineering"],c:["free","paid"],cert:1,r:4.4,u:"https://www.futurelearn.com",t:["UK Universities","Short Courses","Certificates"]},
+  {n:"OpenLearn (Open University UK)",ic:"OU",bg:"#003087",d:"1000+ free courses from the UK Open University. Badges, statements of participation, no signup for most.",s:["cs","business","health","science","arts","engineering","writing","lang","finance"],c:["free"],cert:1,r:4.5,u:"https://www.open.edu/openlearn",t:["UK University","Free Badges","No Signup"]},
+  {n:"LinkedIn Learning",ic:"in",bg:"#0077b5",d:"21,000+ professional courses. Certificates add directly to your LinkedIn profile. 1 month free trial.",s:["cs","ai","data","design","business","marketing","pm","writing","photo"],c:["paid"],cert:1,r:4.5,u:"https://www.linkedin.com/learning",t:["Professional","LinkedIn Profile","Business"]},
+  {n:"Skillshare",ic:"Sk",bg:"#00c853",d:"Creative and business courses. Design, illustration, photography, writing, business strategy. Free trial available.",s:["design","arts","business","marketing","photo","writing"],c:["paid"],cert:0,r:4.3,u:"https://www.skillshare.com",t:["Creative","Design","Business"]},
+  // ── CS & PROGRAMMING ──
+  {n:"Harvard CS50 (edX)",ic:"H",bg:"#a51c30",d:"World's most popular intro CS course. C, Python, SQL, Web Dev, AI. Free certificate upon completion.",s:["cs","ai"],c:["free"],cert:1,r:4.9,u:"https://cs50.harvard.edu/x",t:["Python","Algorithms","Web Dev"]},
+  {n:"freeCodeCamp",ic:"fC",bg:"#0a0a23",d:"100% free. 3000+ hours. Web dev, JS, Python, data structures, ML. Free internationally recognised certificates.",s:["cs","data","ai"],c:["free"],cert:1,r:4.8,u:"https://www.freecodecamp.org",t:["JavaScript","Python","Web Dev"]},
+  {n:"The Odin Project",ic:"OP",bg:"#d24a1c",d:"Free full stack web dev curriculum. HTML, CSS, JavaScript, React, Node.js, Databases — fully project-based.",s:["cs"],c:["free"],cert:0,r:4.7,u:"https://www.theodinproject.com",t:["Full Stack","JavaScript","React"]},
+  {n:"Codecademy",ic:"CC",bg:"#1f4056",d:"Interactive coding right in the browser. Python, JS, SQL, Data Science, Cybersecurity. Pro plan has certificates.",s:["cs","data","cyber"],c:["free","paid"],cert:1,r:4.5,u:"https://www.codecademy.com",t:["Interactive","Python","SQL"]},
+  {n:"MIT OpenCourseWare",ic:"MIT",bg:"#750014",d:"Free MIT course materials for 2,500+ courses. CS, Math, Engineering, Physics. No account needed.",s:["cs","science","engineering"],c:["free"],cert:0,r:4.8,u:"https://ocw.mit.edu",t:["MIT","Engineering","Math"]},
+  {n:"Khan Academy",ic:"KA",bg:"#14bf96",d:"100% free forever. Math, CS, programming, biology, chemistry, economics. Best for strong foundations.",s:["cs","science","finance","health"],c:["free"],cert:0,r:4.8,u:"https://www.khanacademy.org",t:["Math","CS Basics","Science"]},
+  {n:"Pluralsight",ic:"PS",bg:"#f05a28",d:"7000+ tech courses with skill assessments. DevOps, cloud, cybersecurity, software dev. Certificate exam prep.",s:["cs","cloud","cyber","data"],c:["paid"],cert:1,r:4.5,u:"https://www.pluralsight.com",t:["DevOps","Cloud","Security"]},
+  // ── AI & ML ──
+  {n:"Google Cloud Skills Boost",ic:"G",bg:"#4285f4",d:"Official Google AI path. Gen AI, LLMs, Prompt Engineering, Responsible AI. Free digital badges on completion.",s:["ai","cloud","cs"],c:["free"],cert:1,r:4.8,u:"https://cloudskillsboost.google/paths/118",t:["Gen AI","LLMs","Prompt Eng"]},
+  {n:"DeepLearning.AI",ic:"DL",bg:"#0d47a1",d:"Andrew Ng's world-class AI courses. ML specializations, short courses. Most respected AI certifications globally.",s:["ai","data"],c:["free","paid"],cert:1,r:4.9,u:"https://www.deeplearning.ai",t:["Deep Learning","NLP","MLOps"]},
+  {n:"Elements of AI (Helsinki)",ic:"E",bg:"#6200ea",d:"University of Helsinki. 1M+ completions worldwide. Best beginner AI course globally. Fully free with certificate.",s:["ai"],c:["free"],cert:1,r:4.8,u:"https://www.elementsofai.com",t:["AI Basics","Ethics","Beginner"]},
+  {n:"Hugging Face",ic:"🤗",bg:"#ff9d00",d:"NLP, Transformers, Diffusion models, Agents. Free courses from the world's leading AI model platform.",s:["ai","cs"],c:["free"],cert:1,r:4.8,u:"https://huggingface.co/learn",t:["NLP","Transformers","LLMs"]},
+  {n:"Google ML Crash Course",ic:"G",bg:"#34a853",d:"Self-study ML by Google engineers. TensorFlow exercises, video lectures, real-world case studies. Completely free.",s:["ai"],c:["free"],cert:1,r:4.7,u:"https://developers.google.com/machine-learning/crash-course",t:["TensorFlow","Neural Nets","Google"]},
+  {n:"Fast.ai",ic:"f",bg:"#ff4b4b",d:"Practical deep learning for coders. Top-down approach. Free and loved by the global AI community.",s:["ai","cs"],c:["free"],cert:0,r:4.7,u:"https://www.fast.ai",t:["Deep Learning","PyTorch","Practical"]},
+  {n:"Kaggle Learn",ic:"K",bg:"#20beff",d:"100% free. Python, ML, Deep Learning, Data Viz, SQL, NLP. Hands-on notebooks with free certificates.",s:["ai","data","cs"],c:["free"],cert:1,r:4.7,u:"https://www.kaggle.com/learn",t:["Python","ML","SQL"]},
+  // ── DATA SCIENCE ──
+  {n:"IBM SkillsBuild",ic:"IBM",bg:"#1f70c1",d:"Free AI, Data Science & Cybersecurity courses. Credly digital badges accepted by thousands of top employers.",s:["data","ai","cyber"],c:["free"],cert:1,r:4.6,u:"https://skillsbuild.org",t:["Data Science","AI","Credly Badge"]},
+  {n:"DataCamp",ic:"DC",bg:"#05192d",d:"Learn data skills in Python, R, SQL. Interactive exercises, career tracks, projects. Highly practical certificates.",s:["data","ai","cs"],c:["paid"],cert:1,r:4.5,u:"https://www.datacamp.com",t:["Python","R","SQL"]},
+  // ── DESIGN ──
+  {n:"Canva Design School",ic:"Ca",bg:"#7d2ae8",d:"Free graphic design courses. Graphic design, presentations, branding, social media. Official Canva certificates.",s:["design"],c:["free"],cert:1,r:4.5,u:"https://www.canva.com/learn/",t:["Graphic Design","Branding","Visual"]},
+  {n:"Adobe Learn",ic:"Ad",bg:"#ff0000",d:"Free tutorials for Photoshop, Illustrator, Premiere Pro, After Effects. Beginner to advanced. Direct from Adobe.",s:["design","photo","arts"],c:["free"],cert:0,r:4.5,u:"https://learn.adobe.com",t:["Photoshop","Illustrator","Premiere"]},
+  {n:"Figma Education",ic:"Fi",bg:"#f24e1e",d:"Free UI/UX design courses with Figma. Prototyping, design systems, collaboration tools. Official certification.",s:["design"],c:["free"],cert:1,r:4.7,u:"https://www.figma.com/resources/learn-design",t:["UI/UX","Prototyping","Design Systems"]},
+  {n:"Interaction Design Foundation",ic:"IxD",bg:"#7f5af0",d:"World's largest UX design library. 500+ courses, industry-recognised certs used by Google, Apple, and IBM.",s:["design"],c:["paid"],cert:1,r:4.6,u:"https://www.interaction-design.org",t:["UX Research","UI Design","Product"]},
+  {n:"Google UX Design Certificate",ic:"G",bg:"#4285f4",d:"Google's official UX design certificate on Coursera. No experience needed. Portfolio projects included.",s:["design"],c:["paid"],cert:1,r:4.8,u:"https://grow.google/certificates/ux-design",t:["UX","Portfolio","Beginner Friendly"]},
+  // ── BUSINESS ──
+  {n:"HubSpot Academy",ic:"HS",bg:"#ff7a59",d:"Free marketing, sales, and CRM courses. Industry-recognised certifications in inbound marketing and growth.",s:["business","marketing"],c:["free"],cert:1,r:4.6,u:"https://academy.hubspot.com",t:["Marketing","Sales","CRM"]},
+  {n:"Google Digital Garage",ic:"G",bg:"#fbbc04",d:"Free Digital Marketing certificate from Google. Fundamentals of digital marketing. Globally recognised credential.",s:["business","marketing"],c:["free"],cert:1,r:4.7,u:"https://learndigital.withgoogle.com",t:["Digital Marketing","SEO","Analytics"]},
+  {n:"Meta Blueprint",ic:"M",bg:"#0668e1",d:"Official Meta advertising certifications. Facebook & Instagram ads, analytics, marketing strategy.",s:["business","marketing"],c:["free"],cert:1,r:4.5,u:"https://www.facebook.com/business/learn",t:["Social Media","FB Ads","Instagram"]},
+  {n:"Harvard Business School Online",ic:"HB",bg:"#a51c30",d:"World-class business from Harvard. Leadership, strategy, entrepreneurship, analytics. Free and paid options.",s:["business","finance"],c:["free","paid"],cert:1,r:4.8,u:"https://online.hbs.edu",t:["Leadership","Strategy","Entrepreneurship"]},
+  {n:"Google Skillshop",ic:"G",bg:"#fbbc04",d:"Official Google certifications for Ads, Analytics, and Marketing Platform. Free exams with official digital badges.",s:["business","marketing","data"],c:["free"],cert:1,r:4.6,u:"https://skillshop.withgoogle.com",t:["Google Ads","Analytics","Marketing"]},
+  {n:"Google Career Certificates",ic:"GC",bg:"#4285f4",d:"IT Support, Data Analytics, UX Design, Cybersecurity, PM. Accepted by 150,000+ employers. No degree required.",s:["cs","data","design","cyber","pm"],c:["paid"],cert:1,r:4.8,u:"https://grow.google/certificates",t:["Career Switch","No Degree","Entry Level"]},
+  // ── HEALTH ──
+  {n:"OpenWHO",ic:"WHO",bg:"#009cde",d:"World Health Organisation's free learning platform. Public health, disease prevention, emergency response.",s:["health","science"],c:["free"],cert:1,r:4.6,u:"https://openwho.org",t:["Public Health","WHO","Emergency"]},
+  {n:"Yale — Science of Well-Being",ic:"Y",bg:"#00356b",d:"Yale's most popular course ever. Science of happiness and how to live a more satisfying life. Completely free.",s:["health"],c:["free"],cert:1,r:4.9,u:"https://www.coursera.org/learn/the-science-of-well-being",t:["Mental Health","Happiness","Psychology"]},
+  {n:"Johns Hopkins (Coursera)",ic:"JH",bg:"#002d72",d:"Public health, nursing, medicine from Johns Hopkins University. Globally trusted health certifications.",s:["health","science"],c:["free","paid"],cert:1,r:4.7,u:"https://www.coursera.org/jhu",t:["Public Health","Medicine","Nursing"]},
+  {n:"Alison Health Courses",ic:"A",bg:"#e63946",d:"Free health & wellness courses. Nutrition, mental health, first aid, anatomy, pharmacology. Digital certificates.",s:["health"],c:["free"],cert:1,r:4.3,u:"https://alison.com/courses/health",t:["Nutrition","First Aid","Mental Health"]},
+  {n:"Medscape Education",ic:"Me",bg:"#cc0000",d:"Free medical education for healthcare professionals. CME credits, clinical updates, drug information.",s:["health"],c:["free"],cert:1,r:4.5,u:"https://www.medscape.org/education",t:["Medical","CME","Clinical"]},
+  // ── FINANCE ──
+  {n:"CFI (Corporate Finance Institute)",ic:"CFI",bg:"#1b3a6b",d:"Professional finance certifications. Financial modeling, valuation, accounting. Used by top investment banks globally.",s:["finance","business"],c:["free","paid"],cert:1,r:4.6,u:"https://corporatefinanceinstitute.com",t:["Financial Modeling","Valuation","Banking"]},
+  {n:"Investopedia Academy",ic:"Iv",bg:"#1a1a2e",d:"Investing, trading, personal finance courses from Wall Street professionals. Certificates included.",s:["finance"],c:["paid"],cert:1,r:4.4,u:"https://www.investopedia.com/academy",t:["Investing","Trading","Personal Finance"]},
+  {n:"ACCA (Global Accounting)",ic:"AC",bg:"#c8102e",d:"World's most popular accounting qualification. Recognised in 180+ countries. Highly valued by employers globally.",s:["finance","business"],c:["paid"],cert:1,r:4.5,u:"https://www.accaglobal.com",t:["Accounting","Finance","Global Cert"]},
+  {n:"NPTEL Finance Courses",ic:"N",bg:"#ff6600",d:"Free finance and accounting courses by IIT professors. Certificate exams available. Government-recognised credentials.",s:["finance","business"],c:["free"],cert:1,r:4.6,u:"https://nptel.ac.in",t:["IIT Finance","Economics","Accounting"]},
+  // ── LANGUAGES ──
+  {n:"Duolingo",ic:"D",bg:"#58cc02",d:"Gamified language learning. 40+ languages. Free with ads. Duolingo English Test accepted by 4000+ institutions.",s:["lang"],c:["free","paid"],cert:1,r:4.6,u:"https://www.duolingo.com",t:["40+ Languages","Gamified","English Test"]},
+  {n:"BBC Learning English",ic:"BBC",bg:"#bb1919",d:"Free English learning from BBC. Grammar, vocabulary, pronunciation, business English. No signup needed.",s:["lang"],c:["free"],cert:0,r:4.7,u:"https://www.bbc.co.uk/learningenglish",t:["English","Grammar","Pronunciation"]},
+  {n:"British Council",ic:"BC",bg:"#1c3d7e",d:"Learn English with the British Council. Online courses, IELTS prep, business English. Globally recognised.",s:["lang"],c:["free","paid"],cert:1,r:4.6,u:"https://www.britishcouncil.org/english",t:["English","IELTS","Official"]},
+  {n:"Babbel",ic:"Ba",bg:"#5a3e8e",d:"Learn 14 languages with real-life conversation focus. Lessons by linguistic experts. Just 15 minutes a day.",s:["lang"],c:["paid"],cert:0,r:4.3,u:"https://www.babbel.com",t:["14 Languages","Conversational","Expert-Made"]},
+  {n:"Rosetta Stone",ic:"RS",bg:"#002f6c",d:"Immersive language learning in 25+ languages. Speech recognition technology. Trusted by schools worldwide.",s:["lang"],c:["paid"],cert:0,r:4.2,u:"https://www.rosettastone.com",t:["25+ Languages","Immersive","Speech"]},
+  {n:"italki",ic:"ik",bg:"#ff6b35",d:"Learn any language with real human tutors. 1-on-1 live lessons. 10,000+ teachers for 150+ languages.",s:["lang"],c:["paid"],cert:0,r:4.6,u:"https://www.italki.com",t:["Live Tutors","150+ Languages","Conversation"]},
+  // ── CYBERSECURITY ──
+  {n:"TryHackMe",ic:"TH",bg:"#212c42",d:"Learn cybersecurity through hands-on hacking labs. Beginner to advanced. Gamified learning paths with certificates.",s:["cyber","cs"],c:["free","paid"],cert:1,r:4.8,u:"https://tryhackme.com",t:["Ethical Hacking","Pen Testing","Labs"]},
+  {n:"Cisco Networking Academy",ic:"Ci",bg:"#049fd9",d:"Industry-standard networking & cybersecurity. CCNA prep. Free self-paced courses and globally recognised certs.",s:["cyber","cs","engineering"],c:["free","paid"],cert:1,r:4.6,u:"https://www.netacad.com",t:["Networking","CCNA","Cybersecurity"]},
+  {n:"Cybrary",ic:"Cy",bg:"#1b1b2f",d:"Cybersecurity training platform with 1000+ courses. CompTIA, CEH, CISSP prep. Free and paid plans available.",s:["cyber"],c:["free","paid"],cert:1,r:4.5,u:"https://www.cybrary.it",t:["CISSP","CompTIA","CEH Prep"]},
+  // ── CLOUD ──
+  {n:"AWS Training",ic:"AWS",bg:"#ff9900",d:"Official Amazon cloud courses. AWS Certified is one of the highest-paying tech certifications in the world.",s:["cloud","cs"],c:["free","paid"],cert:1,r:4.7,u:"https://aws.amazon.com/training",t:["Cloud","DevOps","AWS Certified"]},
+  {n:"Microsoft Learn",ic:"Ms",bg:"#00a4ef",d:"Free learning paths for Azure, AI, Power BI, and more. Official Microsoft certifications and digital badges.",s:["cloud","ai","cs"],c:["free","paid"],cert:1,r:4.6,u:"https://learn.microsoft.com",t:["Azure","AI","Power BI"]},
+  {n:"Udacity",ic:"UD",bg:"#02b3e4",d:"Industry nanodegrees built with Google, Meta, AWS. Career services, mentor support, hands-on projects.",s:["cs","ai","cloud","data"],c:["paid"],cert:1,r:4.4,u:"https://www.udacity.com",t:["Nanodegree","Mentorship","Industry"]},
+  // ── INDIA ──
+  {n:"NPTEL (IIT & IISc)",ic:"N",bg:"#ff6600",d:"India's top free platform. IIT & IISc professors. Proctored exams. Government-recognised certificates.",s:["cs","engineering","science","ai"],c:["free"],cert:1,r:4.7,u:"https://nptel.ac.in",t:["IIT","Engineering","India"]},
+  {n:"SWAYAM (India Gov)",ic:"SW",bg:"#e65100",d:"India's national education platform by IIT and IIM professors. UGC-recognised certificates. Ideal for Indian students.",s:["cs","engineering","business","science","arts"],c:["free"],cert:1,r:4.6,u:"https://swayam.gov.in",t:["IIM","UGC Recognised","India"]},
+  // ── SCIENCE & MATHS ──
+  {n:"Brilliant.org",ic:"Br",bg:"#f7941e",d:"Learn math, science, CS through interactive problem-solving. Used by 10M+ students. Beautiful visual lessons.",s:["science","cs","ai"],c:["paid"],cert:0,r:4.7,u:"https://brilliant.org",t:["Math","Physics","Problem Solving"]},
+  {n:"Coursera Science & Math",ic:"C",bg:"#0056d2",d:"Science & math from Duke, Johns Hopkins, Imperial College. Statistics to quantum mechanics. Audit for free.",s:["science","engineering"],c:["free","paid"],cert:1,r:4.6,u:"https://www.coursera.org/browse/math-and-logic",t:["Statistics","Physics","Biology"]},
+  {n:"edX Science Courses",ic:"e",bg:"#02262b",d:"Physics, chemistry, biology, mathematics from MIT, Caltech, Harvard. Professionally verified certificates.",s:["science","engineering"],c:["free","paid"],cert:1,r:4.6,u:"https://www.edx.org/learn/science",t:["Chemistry","Biology","MIT Science"]},
+  // ── ARTS & MUSIC ──
+  {n:"Berklee Online",ic:"Be",bg:"#e63946",d:"Music courses from the world's top music school. Music theory, production, songwriting, mixing. Certificates offered.",s:["arts"],c:["free","paid"],cert:1,r:4.6,u:"https://online.berklee.edu",t:["Music Theory","Production","Songwriting"]},
+  {n:"CreativeLive",ic:"CL",bg:"#d63031",d:"Photography, video, art, business. Learn from world-class creators. Free live classes plus on-demand library.",s:["arts","photo","design","business"],c:["free","paid"],cert:1,r:4.5,u:"https://www.creativelive.com",t:["Photography","Video","Creative Arts"]},
+  {n:"Coursera Arts & Humanities",ic:"C",bg:"#0056d2",d:"Arts, history, literature, philosophy from Yale, Princeton, Duke. Audit free, certificate with paid subscription.",s:["arts","writing"],c:["free","paid"],cert:1,r:4.5,u:"https://www.coursera.org/browse/arts-and-humanities",t:["History","Philosophy","Literature"]},
+  // ── WRITING ──
+  {n:"Poynter NewsU",ic:"Po",bg:"#1a1a2e",d:"Free journalism & writing courses. News writing, fact-checking, media ethics. Trusted by journalists worldwide.",s:["writing"],c:["free","paid"],cert:1,r:4.5,u:"https://www.poynter.org/newsu",t:["Journalism","News Writing","Ethics"]},
+  {n:"Coursera Writing Courses",ic:"C",bg:"#0056d2",d:"Academic and creative writing from Duke, Wesleyan, Michigan. Content writing, editing, business communication.",s:["writing"],c:["free","paid"],cert:1,r:4.5,u:"https://www.coursera.org/browse/language-learning/writing",t:["Academic Writing","Creative","Content"]},
+  // ── PHOTOGRAPHY ──
+  {n:"Alison Photography",ic:"A",bg:"#e63946",d:"Free photography & video production courses. Camera basics, composition, editing, professional techniques.",s:["photo"],c:["free"],cert:1,r:4.3,u:"https://alison.com/courses/creative-arts-photography",t:["Camera","Editing","Video"]},
+  {n:"Udemy Photography",ic:"U",bg:"#a435f0",d:"1000+ photography courses. DSLR basics, portrait, landscape, editing in Lightroom. Often on huge sale.",s:["photo","arts"],c:["paid"],cert:1,r:4.5,u:"https://www.udemy.com/courses/photography",t:["DSLR","Portrait","Lightroom"]},
+  // ── PROJECT MANAGEMENT ──
+  {n:"Google Project Management",ic:"G",bg:"#4285f4",d:"Google's official PM certificate. No degree or experience needed. Agile, Scrum, project lifecycle. 150,000+ hiring partners.",s:["pm","business"],c:["paid"],cert:1,r:4.8,u:"https://grow.google/certificates/project-management",t:["Agile","Scrum","Entry Level"]},
+  {n:"Alison Project Management",ic:"A",bg:"#e63946",d:"Free PM courses and certificates. PMP prep, Agile, Scrum, risk management. Free digital certificates.",s:["pm","business"],c:["free"],cert:1,r:4.3,u:"https://alison.com/courses/project-management",t:["PMP Prep","Agile","Scrum"]},
+  {n:"PMI Training",ic:"PMI",bg:"#243782",d:"Official Project Management Institute. PMP is one of the world's most valued and highest-paying PM credentials.",s:["pm","business"],c:["paid"],cert:1,r:4.5,u:"https://www.pmi.org/certifications",t:["PMP","CAPM","Professional"]},
+  // ── ENGINEERING ──
+  {n:"Coursera Engineering",ic:"C",bg:"#0056d2",d:"Engineering from Duke, UC San Diego, Imperial College London. Civil, mechanical, electrical, robotics and more.",s:["engineering","science"],c:["free","paid"],cert:1,r:4.6,u:"https://www.coursera.org/browse/engineering",t:["Civil","Mechanical","Electrical"]},
+  {n:"edX Engineering",ic:"e",bg:"#02262b",d:"Engineering courses from MIT, Georgia Tech, Purdue. Robotics, materials science, structural engineering.",s:["engineering","science"],c:["free","paid"],cert:1,r:4.7,u:"https://www.edx.org/learn/engineering",t:["MIT Engineering","Robotics","Materials"]},
+];
+
+let costF='all', subF='all';
+
+function setCost(v,btn){
+  costF=v;
+  document.querySelectorAll('#costRow .fb').forEach(b=>{b.classList.remove('active','free-active','paid-active')});
+  btn.classList.add('active');
+  if(v==='free') btn.classList.add('free-active');
+  if(v==='paid') btn.classList.add('paid-active');
+  apply();
+}
+
+function setSub(v,btn){
+  subF=v;
+  document.querySelectorAll('#subRow .fb').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  apply();
+}
+
+function apply(){
+  const q=document.getElementById('searchInput').value.toLowerCase().trim();
+  const cards=document.querySelectorAll('.card');
+  let vis=0;
+  cards.forEach(card=>{
+    const dc=card.getAttribute('data-cost')||'';
+    const ds=card.getAttribute('data-sub')||'';
+    const txt=card.textContent.toLowerCase();
+    const cm=costF==='all'||(costF==='free'&&dc.includes('free'))||(costF==='paid'&&dc.includes('paid'));
+    const sm=subF==='all'||ds.split(' ').includes(subF);
+    const qm=q.length===0||txt.includes(q);
+    const show=cm&&sm&&qm;
+    card.classList.toggle('hidden',!show);
+    if(show)vis++;
+  });
+  document.getElementById('resCount').textContent=vis;
+  document.getElementById('noRes').style.display=vis===0?'block':'none';
+}
+
+function render(){
+  const grid=document.getElementById('grid');
+  const noRes=document.getElementById('noRes');
+  P.forEach(p=>{
+    const card=document.createElement('a');
+    card.className='card';
+    card.href=p.u;
+    card.target='_blank';
+    card.setAttribute('data-cost',p.c.join(' '));
+    card.setAttribute('data-sub',p.s.join(' '));
+    const badges=p.c.map(c=>c==='free'?'<span class="badge bf">Free</span>':'<span class="badge bp">Paid</span>').join('');
+    const cert=p.cert?'<span class="badge bc">Cert</span>':'';
+    const tags=p.t.map(t=>`<span class="tag">${t}</span>`).join('');
+    card.innerHTML=`<div class="card-top"><div class="c-icon" style="background:${p.bg};color:#fff">${p.ic}</div><div class="badges">${badges}${cert}</div></div><div class="c-name">${p.n}</div><div class="c-desc">${p.d}</div><div class="c-tags">${tags}</div><div class="c-footer"><span class="vlink">Visit →</span><span class="rating">★ ${p.r}</span></div>`;
+    grid.insertBefore(card,noRes);
+  });
+  document.getElementById('resCount').textContent=P.length;
+  document.getElementById('totalCount').textContent=P.length+'+';
+  document.getElementById('navPill').textContent=P.length+'+ Platforms';
+}
+
+document.getElementById('searchInput').addEventListener('input',apply);
+render();
+</script>
+</body>
+</html>
